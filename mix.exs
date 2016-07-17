@@ -2,12 +2,16 @@ defmodule Orientex.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :orientex,
-     version: "0.1.0",
-     elixir: "~> 1.3",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps()]
+    [
+      app: :orientex,
+      version: "0.0.1",
+      elixir: "~> 1.3",
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      deps: deps(),
+      description: description(),
+      package: package(),
+    ]
   end
 
   # Configuration for the OTP application
@@ -27,6 +31,24 @@ defmodule Orientex.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:db_connection, "~>1.0-rc"},
+    ]
+  end
+
+  defp description do
+    """
+    An OrientDB network binary protocol driver for Elixir 1.3+ using DBConnection.
+    """
+  end
+
+  defp package do
+    [
+      name: :orientex,
+      files: ["config", "lib", "test", ".gitignore", "LICENSE*", "mix.exs", "README*"],
+      maintainers: ["Austin S. Morris"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/austinsmorris/orientex"},
+    ]
   end
 end
