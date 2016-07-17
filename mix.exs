@@ -4,10 +4,11 @@ defmodule Orientex.Mixfile do
   def project do
     [
       app: :orientex,
-      version: "0.0.1",
+      version: "0.0.2",
       elixir: "~> 1.3",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
+      name: "Orientex",
       deps: deps(),
       description: description(),
       package: package(),
@@ -44,7 +45,6 @@ defmodule Orientex.Mixfile do
 
   defp package do
     [
-      name: :orientex,
       files: ["config", "lib", "test", ".gitignore", "LICENSE*", "mix.exs", "README*"],
       maintainers: ["Austin S. Morris"],
       licenses: ["MIT"],
