@@ -1,4 +1,4 @@
-# Orientex
+# Orientex [![Build Status](https://travis-ci.org/austinsmorris/orientex.svg?branch=master)](https://travis-ci.org/austinsmorris/orientex)
 
 **TODO: Add description**
 
@@ -21,4 +21,3 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
       [applications: [:orientex]]
     end
     ```
-
