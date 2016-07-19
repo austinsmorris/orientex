@@ -1,11 +1,16 @@
 defmodule Orientex do
   # alias Orientex.Query
 
-  # @default_opts []
+  @default_opts [
+    host: :localhost,
+    port: 2424,
+    username: "root",
+    password: "",
+  ]
 
   @spec start_link(Keyword.t) :: {:ok, pid} | {:error, any}
   def start_link(opts \\ []) do
-    DBConnection.start_link(Orientex.Protocol, opts)
+    DBConnection.start_link(Orientex.Protocol, Keyword.merge(@default_opts, opts))
   end
 
   # def command(conn, query, params, opts \\ []) do
