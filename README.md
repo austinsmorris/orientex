@@ -1,4 +1,6 @@
-# Orientex [![Build Status](https://travis-ci.org/austinsmorris/orientex.svg?branch=master)](https://travis-ci.org/austinsmorris/orientex)
+# Orientex
+
+[![Build Status](https://travis-ci.org/austinsmorris/orientex.svg?branch=master)](https://travis-ci.org/austinsmorris/orientex)
 
 **TODO: Add description**
 

@@ -1,2 +1,4 @@
-%{"connection": {:hex, :connection, "1.0.3", "3145f7416be3df248a4935f24e3221dc467c1e3a158d62015b35bd54da365786", [:mix], []},
+%{"bunt": {:hex, :bunt, "0.1.6", "5d95a6882f73f3b9969fdfd1953798046664e6f77ec4e486e6fafc7caad97c6f", [:mix], []},
+  "connection": {:hex, :connection, "1.0.3", "3145f7416be3df248a4935f24e3221dc467c1e3a158d62015b35bd54da365786", [:mix], []},
+  "credo": {:hex, :credo, "0.4.6", "30febde77446dfff48055f9ac3d8bfc9d9250e787c1ed75deab7073841ab7ad1", [:mix], [{:bunt, "~> 0.1.6", [hex: :bunt, optional: false]}]},
   "db_connection": {:hex, :db_connection, "1.0.0-rc.3", "d9ceb670fe300271140af46d357b669983cd16bc0d01206d7d3222dde56cf038", [:mix], [{:sbroker, "~> 1.0.0-beta.3", [hex: :sbroker, optional: true]}, {:poolboy, "~> 1.5", [hex: :poolboy, optional: true]}, {:connection, "~> 1.0.2", [hex: :connection, optional: false]}]}}

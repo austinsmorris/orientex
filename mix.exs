@@ -34,6 +34,7 @@ defmodule Orientex.Mixfile do
   defp deps do
     [
       {:db_connection, "~>1.0-rc"},
+      {:credo, "~> 0.4", only: [:dev, :test]}
     ]
   end
 
