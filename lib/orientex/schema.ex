@@ -1,4 +1,6 @@
 defmodule Orientex.Schema do
+  @moduledoc false
+  
   defstruct progress: [], result: [], schema: []
 
   # server operations

@@ -1,4 +1,8 @@
 defmodule Orientex do
+  @moduledoc """
+  An OrientDB network binary protocol driver for Elixir using DBConnection.
+  """
+  
   # alias Orientex.Query
 
   @default_opts [
