@@ -1,4 +1,6 @@
 defmodule Orientex.Tokenizer do
+  @moduledoc false
+  
   alias Orientex.Schema
   alias Orientex.Types
 
