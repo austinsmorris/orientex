@@ -17,4 +17,9 @@ defmodule Orientex.RequestTest do
     value = Request.get_operation_value(:request_db_open)
     assert value == 3
   end
+
+  test "get_operation_value for :request_command" do
+    value = Request.get_operation_value(:request_command)
+    assert value == 41
+  end
 end

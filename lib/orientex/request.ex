@@ -36,7 +36,7 @@ defmodule Orientex.Request do
   # def get_operation_value(:request_record_copy), do: 34
   # def get_operation_value(:request_record_clean_out), do: 38
   # def get_operation_value(:request_positions_floor), do: 39
-  # def get_operation_value(:request_command), do: 41
+  def get_operation_value(:request_command), do: 41
   # def get_operation_value(:request_positions_ceiling), do: 42
   # def get_operation_value(:request_tx_commit), do: 60
   # def get_operation_value(:request_db_reload), do: 73
@@ -60,6 +60,6 @@ defmodule Orientex.Request do
   # # def get_operation_value(:request_incremental_restore), do: ???
 
   defp encode_request_header(request, session_id) do
-    Types.encode([{:byte, Request.get_operation_value(request)}, {:int, session_id}])
+    Types.encode([{:byte, get_operation_value(request)}, {:int, session_id}])
   end
 end

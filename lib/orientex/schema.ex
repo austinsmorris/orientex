@@ -30,7 +30,7 @@ defmodule Orientex.Schema do
   # def get_schema_for_request(:request_record_copy), do:
   # def get_schema_for_request(:request_record_clean_out), do:
   # def get_schema_for_request(:request_positions_floor), do:
-  # def get_schema_for_request(:request_command), do: %__MODULE__{schema: __MODULE__.Command.get_schema}
+  def get_schema_for_request(:request_command), do: %__MODULE__{schema: __MODULE__.Command.get_schema}
   # def get_schema_for_request(:request_positions_ceiling), do:
   # def get_schema_for_request(:request_tx_commit), do:
   # def get_schema_for_request(:request_db_reload), do:
