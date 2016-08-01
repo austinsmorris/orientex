@@ -3,7 +3,7 @@ defmodule Orientex.Protocol do
 
   # todo - test!
 
-  # alias Orientex.Query
+  alias Orientex.Query
   alias Orientex.Request
   alias Orientex.Schema
   alias Orientex.Tokenizer
@@ -16,6 +16,7 @@ defmodule Orientex.Protocol do
   @protocol_version 36
   @timeout 1_000
 
+  # todo - test
   @spec connect(opts :: Keyword.t) :: {:ok, state :: any} | {:error, Exception.t}
   def connect(opts) do
     host = Keyword.get(opts, :host)
@@ -53,26 +54,28 @@ defmodule Orientex.Protocol do
 
   # @spec ping(state :: any) :: {:ok, new_state :: any} | {:disconnect, Exception.t, new_state :: any}
 
-  # @spec handle_prepare(DBConnection.query, opts :: Keyword.t, state :: any) ::
-  #   {:ok, DBConnection.query, new_state :: any} | {:error | :disconnect, Exception.t, new_state :: any}
-  # def handle_prepare(%Query{request: request, query: query}, opts, state) do
-  #   {:ok, %Query{request: request, session_id: state.session_id, query: query}, state}
-  # end
+  # todo - test
+  @spec handle_prepare(DBConnection.query, opts :: Keyword.t, state :: any) ::
+    {:ok, DBConnection.query, new_state :: any} | {:error | :disconnect, Exception.t, new_state :: any}
+  def handle_prepare(%Query{request: request, query: query}, opts, state) do
+    {:ok, %Query{request: request, session_id: state.session_id, query: query}, state}
+  end
 
-  # @spec handle_execute(DBConnection.query, DBConnection.params, opts :: Keyword.t, state :: any) ::
-  #   {:ok, DBConnection.result, new_state :: any} | {:error | :disconnect, Exception.t, new_state :: any}
-  # def handle_execute(%Query{request: request}, params, opts, %__MODULE__{socket: {socket_module, socket}} = state) do
-  #   # todo - encapsulate common code for sending request
-  #   # todo = error check send
-  #   # with db_connection, the encoded query is in the params.
-  #   :ok = socket_module.send(socket, params)
-  #
-  #   # todo - error check get_data
-  #   {:ok, result} = get_data(Schema.get_schema_for_request(request), socket_module, socket)
-  #
-  #   # todo - ensure session id received matches session id in the state
-  #   {:ok, result, state}
-  # end
+  # todo - test
+  @spec handle_execute(DBConnection.query, DBConnection.params, opts :: Keyword.t, state :: any) ::
+    {:ok, DBConnection.result, new_state :: any} | {:error | :disconnect, Exception.t, new_state :: any}
+  def handle_execute(%Query{request: request}, params, opts, %__MODULE__{socket: {socket_module, socket}} = state) do
+    # todo - encapsulate common code for sending request
+    # todo = error check send
+    # with db_connection, the encoded query is in the params.
+    :ok = socket_module.send(socket, params)
+
+    # todo - error check get_data
+    {:ok, result} = get_data(Schema.get_schema_for_request(request), socket_module, socket)
+
+    # todo - ensure session id received matches session id in the state
+    {:ok, result, state}
+  end
 
   defp encode_connect_request(request, opts) do
     # todo - automatically fetch current version
