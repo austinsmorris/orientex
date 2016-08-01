@@ -7,5 +7,5 @@ otp_release:
   - 19.0
 
 script:
-  - mix credo
+  - mix credo --strict --all
   - mix test
