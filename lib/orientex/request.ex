@@ -1,6 +1,13 @@
 defmodule Orientex.Request do
   @moduledoc false
 
+  alias Orientex.Types
+
+  # todo - specs, docs, test
+  def encode(:request_command, session_id, query, params, opts) do
+    encode_request_header(:request_command, session_id) <> __MODULE__.Command.encode(query, params, opts)
+  end
+
   # todo - specs, docs, tests
   # server operations
   def get_operation_value(:request_shutdown), do: 1
@@ -51,4 +58,8 @@ defmodule Orientex.Request do
   # def get_operation_value(:request_index_put), do: 121
   # def get_operation_value(:request_index_remove), do: 122
   # # def get_operation_value(:request_incremental_restore), do: ???
+
+  defp encode_request_header(request, session_id) do
+    Types.encode([{:byte, Request.get_operation_value(request)}, {:int, session_id}])
+  end
 end

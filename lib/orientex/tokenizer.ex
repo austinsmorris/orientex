@@ -1,9 +1,10 @@
 defmodule Orientex.Tokenizer do
   @moduledoc false
-  
+
   alias Orientex.Schema
   alias Orientex.Types
 
+  # todo - docs, specs
   def tokenize(%Schema{result: result}, <<>>), do: {:ok, Enum.reverse(result)}
   def tokenize(%Schema{schema: [type | schema_tail]} = schema, data) do
     case do_tokenize_with_progress(schema, data) do
