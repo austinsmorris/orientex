@@ -21,7 +21,6 @@ defmodule Orientex.Types do
   def decode(:long, tail), do: {:incomplete, nil, tail}
 
   # binary data
-  # todo - test
   def decode(:bytes, data) when is_binary(data), do: decode(:binary, data)
   def decode(:record, data) when is_binary(data), do: decode(:binary, data)
   def decode(:string, data) when is_binary(data), do: decode(:binary, data)
@@ -31,8 +30,17 @@ defmodule Orientex.Types do
   end
   def decode(:binary, tail), do: {:incomplete, nil, tail}
 
+  def decode_binary(-1, data), do: {:ok, nil, data}
+  def decode_binary(length, data) when byte_size(data) >= length do
+    <<value :: bytes-size(length), tail :: binary>> = data
+    {:ok, value, tail}
+  end
+  def decode_binary(length, data) do
+    {:incomplete, nil, <<length :: signed-size(32), data :: binary>>}
+  end
+
   # compound types
-  # todo - test
+  # todo - test compound types
   def decode({count_type, template}, data) when is_list(template)do
     case decode(count_type, data) do
       {:ok, count, tail} ->
@@ -66,15 +74,6 @@ defmodule Orientex.Types do
     end
   end
 
-  def decode_binary(-1, data), do: {:ok, nil, data}
-  def decode_binary(length, data) when byte_size(data) >= length do
-    <<value :: bytes-size(length), tail :: binary>> = data
-    {:ok, value, tail}
-  end
-  def decode_binary(length, data) do
-    {:incomplete, nil, <<length :: signed-size(32), data :: binary>>}
-  end
-
   defp do_decode_list([type | []], data, acc) do
     case decode(type, data) do
       {:ok, value, tail} ->
@@ -90,39 +89,41 @@ defmodule Orientex.Types do
   end
 
   # Encode!
-  # todo - test
 
   def encode(list) when is_list(list) do
     Enum.reduce(list, <<>>, fn(value, acc) -> acc <> encode(value) end)
   end
 
   # in OrientDB, all instances of NULL are sent as a -1 in 4 bytes
-  def encode(:nil), do: encode({:int, -1})
+  def encode(nil), do: encode({:int, -1})
 
   # boolean
   def encode(:false), do: <<0>>
   def encode(:true), do: <<1>>
-  def encode({:boolean, value}) when is_boolean(value), do: <<value>>
 
   # byte
-  # todo - product against multi-byte strings
-  def encode({:byte, value}) when is_binary(value), do: value
+  def encode({:byte, value}) when is_binary(value) and byte_size(value) == 1, do: value
   def encode({:byte, value}) when is_integer(value) and value >= -128 and value <= 127, do: <<value>>
 
-  # todo - default integer encoding?
-
   # short, int, and long
-  def encode({:short, value}) when is_integer(value) and value >= -32_768 and value <= 32_767, do: <<value :: signed-size(16)>>
-  def encode({:int, value}) when is_integer(value) and value >= -2_147_483_648 and value <= 2_147_483_647, do: <<value :: signed-size(32)>>
-  def encode({:long, value}) when is_integer(value) and value >= -9_223_372_036_854_775_808 and value <= 9_223_372_036_854_775_807, do: <<value :: signed-size(64)>>
+  def encode({:short, value}) when is_integer(value) and value >= -32_768 and value <= 32_767 do
+    <<value :: signed-size(16)>>
+  end
+  def encode({:int, value}) when is_integer(value) and value >= -2_147_483_648 and value <= 2_147_483_647 do
+    <<value :: signed-size(32)>>
+  end
+  def encode({:long, value}) when
+  is_integer(value) and value >= -9_223_372_036_854_775_808 and value <= 9_223_372_036_854_775_807 do
+    <<value :: signed-size(64)>>
+  end
 
   # bytes and strings
-  def encode({:bytes, value}) when is_binary(value), do: encode(value)
-  def encode({:string, value}) when is_binary(value), do: encode(value)
-  def encode(value) when is_binary(value), do: encode({:int, byte_size(value)}) <> value
+  def encode({:bytes, value}) when is_binary(value), do: encode({:binary, value})
+  def encode({:string, value}) when is_binary(value), do: encode({:binary, value})
+  def encode({:binary, value}) when is_binary(value), do: encode({:int, byte_size(value)}) <> value
 
   # todo - record
-  # def encode(value), do:
+  # def encode({:record, value}), do:
 
   # strings
   def encode({:strings, value}) when is_list(value) do
