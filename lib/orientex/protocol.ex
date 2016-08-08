@@ -3,6 +3,7 @@ defmodule Orientex.Protocol do
 
   # todo - test!
 
+  alias Orientex.Mixfile
   alias Orientex.Query
   alias Orientex.Request
   alias Orientex.Schema
@@ -78,12 +79,11 @@ defmodule Orientex.Protocol do
   end
 
   defp encode_connect_request(request, opts) do
-    # todo - automatically fetch current version
     a = Types.encode([
       {:byte, Request.get_operation_value(request)}, # operation
       nil, # initial session_id
       {:string, "Orientex"}, # driver name
-      {:string, "0.0.5"}, # driver version
+      {:string, Keyword.get(Orientex.Mixfile.project, :version)}, # driver version
       {:short, @protocol_version}, # protocol version
       {:string, ""}, # client id
       {:string, "ORecordSerializerBinary"}, # serialization implementation
