@@ -5,18 +5,16 @@ defmodule Orientex.Request.Command do
 
   # todo - docs, specs, test
   def encode(query, params, opts) do
-    # todo - select between idempotent query and command
-    class_name = Types.encode("q") # class name for query
-    # class_name = Types.encode("c") # class name for command
+    class_name = query |> get_class_name_encoding_for_query() |> Types.encode()
 
     # todo - allow passing in the limit
     # todo - allow fetch plans
     # todo - allow serialized parameters
     command_payload = Types.encode([
-      query, # query text
+      {:string, query}, # query text
       {:int, -1}, #non-text limit - -1 means use limit in query text
-      "", # fetch plan
-      "", # serialized parameters
+      {:string, ""}, # fetch plan
+      {:string, ""}, # serialized parameters
     ])
 
     command_payload_length = IO.iodata_length([class_name, command_payload])
@@ -27,5 +25,13 @@ defmodule Orientex.Request.Command do
     ])
 
     beginning <> class_name <> command_payload
+  end
+
+  defp get_class_name_encoding_for_query(query) do
+    if query =~ ~r/^\s*(SELECT|TRAVERSE).+/i do
+      {:string, "q"}
+    else
+      {:string, "c"}
+    end
   end
 end
