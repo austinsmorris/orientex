@@ -16,6 +16,10 @@ defmodule Orientex.Response.Command do
     Enum.map(records, &parse_record/1)
   end
 
+  defp parse_result("w", [record, 0]) do
+    parse_record(record)
+  end
+
   defp parse_record([0, 100 | record]) do # full record, document (100 == "d")
     [cluster_id, cluster_position, record_version, content] = record
     {_serialization_version, class_name, data} = Record.decode(content)
