@@ -10,6 +10,13 @@ defmodule Orientex.TokenizerTest do
     assert result == [4, 3, 2, 1]
   end
 
+  test "variable schema is resolved when using variable schema" do
+    schema_fun = fn(a) -> if a == 1, do: [:byte], else: [:short] end
+    schema = %Schema{schema: [:short, schema_fun]}
+    {:ok, result} = Tokenizer.tokenize(schema, <<0, 2, 1, 1>>)
+    assert result == [2, 257]
+  end
+
   test "tokenized data is returned when data is coplete" do
     schema = %Schema{schema: [:short, :byte]}
     {:ok, result} = Tokenizer.tokenize(schema, <<1, 1, 4>>)
