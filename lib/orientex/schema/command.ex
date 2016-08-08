@@ -11,6 +11,10 @@ defmodule Orientex.Schema.Command do
     [{:int, [:short, :byte, :short, :long, :int, :record]}, :byte]
   end
 
+  def get_schema_for_result_type(110) do # 110 is the byte for "n"
+    [:byte]
+  end
+
   def get_schema_for_result_type(119) do # 119 is the byte for "w"
     [[:short, :byte, :short, :long, :int, :record], :byte]
   end

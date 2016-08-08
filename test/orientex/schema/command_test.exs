@@ -17,6 +17,12 @@ defmodule Orientex.Schema.CommandTest do
     assert schema == [{:int, [:short, :byte, :short, :long, :int, :record]}, :byte]
   end
 
+  test "the proper schema is returned for null result" do
+    [a, b, c, d] = Command.get_schema()
+    schema = d.(110)
+    assert schema == [:byte]
+  end
+
   test "the proper schema is returned for wrapped single record" do
     [a, b, c, d] = Command.get_schema()
     schema = d.(119)

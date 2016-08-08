@@ -16,6 +16,10 @@ defmodule Orientex.Response.Command do
     Enum.map(records, &parse_record/1)
   end
 
+  defp parse_result("n", [0]) do
+    nil
+  end
+
   defp parse_result("w", [record, 0]) do
     parse_record(record)
   end
