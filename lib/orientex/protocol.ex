@@ -82,21 +82,21 @@ defmodule Orientex.Protocol do
     a = Types.encode([
       {:byte, Request.get_operation_value(request)}, # operation
       nil, # initial session_id
-      "Orientex", # driver name
-      "0.0.4", # driver version
+      {:string, "Orientex"}, # driver name
+      {:string, "0.0.4"}, # driver version
       {:short, @protocol_version}, # protocol version
-      "", # client id
-      "ORecordSerializerBinary", # serialization implementation
+      {:string, ""}, # client id
+      {:string, "ORecordSerializerBinary"}, # serialization implementation
       false, # token session
       false, # support push
       false, # collect stats
     ])
 
-    b = if request == :request_db_open, do: Types.encode(Keyword.get(opts, :db, nil)), else: <<>> # db name
+    b = if request == :request_db_open, do: Types.encode({:string, Keyword.get(opts, :db, nil)}), else: <<>> # db name
 
     c = Types.encode([
-      Keyword.get(opts, :username, ""), # username
-      Keyword.get(opts, :password, ""), # password
+      {:string, Keyword.get(opts, :username, "")}, # username
+      {:string, Keyword.get(opts, :password, "")}, # password
     ])
 
     a <> b <> c
