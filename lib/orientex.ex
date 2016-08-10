@@ -12,6 +12,8 @@ defmodule Orientex do
     password: "",
   ]
 
+  @version Mix.Project.config[:version]
+
   @spec start_link(Keyword.t) :: {:ok, pid} | {:error, any}
   def start_link(opts \\ []) do
     DBConnection.start_link(Orientex.Protocol, Keyword.merge(@default_opts, opts))
@@ -20,4 +22,6 @@ defmodule Orientex do
   def command(conn, query, params, opts \\ []) do
     DBConnection.prepare_execute(conn, %Query{request: :request_command, query: query}, params, opts)
   end
+
+  def version, do: @version
 end

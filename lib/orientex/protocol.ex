@@ -83,7 +83,7 @@ defmodule Orientex.Protocol do
       {:byte, Request.get_operation_value(request)}, # operation
       nil, # initial session_id
       {:string, "Orientex"}, # driver name
-      {:string, Keyword.get(Mixfile.project, :version)}, # driver version
+      {:string, Orientex.version()}, # driver version
       {:short, @protocol_version}, # protocol version
       {:string, ""}, # client id
       {:string, "ORecordSerializerBinary"}, # serialization implementation

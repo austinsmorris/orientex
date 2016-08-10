@@ -1,8 +1,8 @@
 defmodule OrientexTest do
   use ExUnit.Case
-  doctest Orientex
+  # doctest Orientex
 
-  test "the truth" do
-    assert 1 + 1 == 2
+  test "version() returns the current version" do
+    assert Orientex.version() == Mix.Project.config[:version]
   end
 end
