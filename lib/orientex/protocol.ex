@@ -3,7 +3,6 @@ defmodule Orientex.Protocol do
 
   # todo - test!
 
-  alias Orientex.Mixfile
   alias Orientex.Query
   alias Orientex.Request
   alias Orientex.Schema
