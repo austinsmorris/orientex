@@ -14,6 +14,11 @@ defmodule Orientex do
 
   @version Mix.Project.config[:version]
 
+  @spec child_spec(Keyword.t) :: Supervisor.Spec.spec
+  def child_spec(opts) do
+    DBConnection.child_spec(Orientex.Protocol, opts)
+  end
+
   @spec start_link(Keyword.t) :: {:ok, pid} | {:error, any}
   def start_link(opts \\ []) do
     DBConnection.start_link(Orientex.Protocol, Keyword.merge(@default_opts, opts))

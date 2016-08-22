@@ -12,19 +12,19 @@ defmodule Orientex.Schema.CommandTest do
   end
 
   test "the proper schema is returned for list of records" do
-    [a, b, c, d] = Command.get_schema()
+    [_, _, _, d] = Command.get_schema()
     schema = d.(108)
     assert schema == [{:int, [:short, :byte, :short, :long, :int, :record]}, :byte]
   end
 
   test "the proper schema is returned for null result" do
-    [a, b, c, d] = Command.get_schema()
+    [_, _, _, d] = Command.get_schema()
     schema = d.(110)
     assert schema == [:byte]
   end
 
   test "the proper schema is returned for wrapped single record" do
-    [a, b, c, d] = Command.get_schema()
+    [_, _, _, d] = Command.get_schema()
     schema = d.(119)
     assert schema == [[:short, :byte, :short, :long, :int, :record], :byte]
   end
