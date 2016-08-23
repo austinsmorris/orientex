@@ -5,7 +5,7 @@ defmodule Orientex.Query do
   alias Orientex.Response
   alias Orientex.Types
 
-  defstruct name: nil, query: "", request: nil, session_id: nil,
+  defstruct name: nil, query: "", request: nil, session_id: nil
 
   defimpl DBConnection.Query do
     # todo - test
