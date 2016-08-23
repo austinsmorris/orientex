@@ -22,6 +22,12 @@ defmodule Orientex.Types.Record do
     {varint_string, varint_string_tail}
   end
 
+  def decode(:link, data) do
+    {cluster_id, tail} = decode(:varint, data)
+    {cluster_position, link_tail} = decode(:varint, tail)
+    {{cluster_id, cluster_position}, link_tail}
+  end
+
   defp do_decode_varint(<<1 :: 1, value :: 7, tail :: binary>>, shift, acc) do
     do_decode_varint(tail, shift + 7, Bitwise.bsl(value, shift) + acc)
   end

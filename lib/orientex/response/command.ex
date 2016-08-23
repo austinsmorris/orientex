@@ -73,6 +73,10 @@ defmodule Orientex.Response.Command do
     {value, _} = Record.decode(:varint_string, get_data_at_position(position, data))
     {key, value, header_tail}
   end
+  defp parse_property({key, position, 13, header_tail}, data) do # 13 = link
+    {{cluster_id, cluster_position}, _} = Record.decode(:link, get_data_at_position(position, data))
+    {key, %RID{cluster_id: cluster_id, cluster_position: cluster_position}, header_tail}
+  end
 
   defp get_data_at_position(position, data) do
     << _ :: bytes-size(position), value :: binary>> = data
