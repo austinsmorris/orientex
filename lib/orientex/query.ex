@@ -5,7 +5,7 @@ defmodule Orientex.Query do
   alias Orientex.Response
   alias Orientex.Types
 
-  defstruct name: nil, request: nil, session_id: nil, query: ""
+  defstruct name: nil, query: "", request: nil, session_id: nil,
 
   defimpl DBConnection.Query do
     # todo - test
@@ -31,5 +31,11 @@ defmodule Orientex.Query do
     def parse(query, opts) do
       query
     end
+  end
+end
+
+defimpl String.Chars, for: Orientex.Query do
+  def to_string(%Orientex.Query{query: query}) do
+    IO.iodata_to_binary(query)
   end
 end
