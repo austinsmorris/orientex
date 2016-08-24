@@ -25,7 +25,7 @@ defmodule Orientex do
   end
 
   def command(conn, query, params, opts \\ []) do
-    DBConnection.prepare_execute(conn, %Query{request: :request_command, query: query}, params, opts)
+    DBConnection.prepare_execute(conn, %Query{request: :request_command, statement: query}, params, opts)
   end
 
   def version, do: @version

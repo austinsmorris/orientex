@@ -2,14 +2,15 @@ defmodule Orientex.Response.Command do
   @moduledoc false
 
   alias Orientex.Document
-  alias Orientex.Response
+  alias Orientex.Result
   alias Orientex.RID
   alias Orientex.Types
   alias Orientex.Types.Record
 
   # todo - docs, specs, test
-  def parse([success, session_id, result_type | tail]) do
-    %Response{content: parse_result(<<result_type>>, tail), session_id: session_id, success: success}
+  # todo - we can't always get the count here.  Need to derive it from parse_result
+  def parse([success, session_id, result_type | [{count, _}, 0] = tail]) do
+    %Result{content: parse_result(<<result_type>>, tail), num_rows: count, session_id: session_id, success: success}
   end
 
   defp parse_result("l", [{count, records}, 0]) do

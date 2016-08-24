@@ -55,8 +55,8 @@ defmodule Orientex.Protocol do
 
   @spec handle_prepare(DBConnection.query, opts :: Keyword.t, state :: any) ::
     {:ok, DBConnection.query, new_state :: any} | {:error | :disconnect, Exception.t, new_state :: any}
-  def handle_prepare(%Query{request: request, query: query}, opts, state) do
-    {:ok, %Query{request: request, session_id: state.session_id, query: query}, state}
+  def handle_prepare(%Query{} = query, opts, state) do
+    {:ok, %Query{query | session_id: state.session_id}, state}
   end
 
   @spec handle_execute(DBConnection.query, DBConnection.params, opts :: Keyword.t, state :: any) ::

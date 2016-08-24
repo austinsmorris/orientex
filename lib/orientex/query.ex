@@ -1,41 +1,51 @@
 defmodule Orientex.Query do
   @moduledoc false
 
+  defstruct name: "", request: nil, session_id: nil, statement: ""
+end
+
+defimpl DBConnection.Query, for: Orientex.Query do
+  alias Orientex.Query
   alias Orientex.Request
   alias Orientex.Response
-  alias Orientex.Types
 
-  defstruct name: nil, query: "", request: nil, session_id: nil
-
-  defimpl DBConnection.Query do
-    # todo - test
-    @spec decode(any, any, Keyword.t) :: any
-    def decode(%Orientex.Query{request: request}, result, opts) do
-      Response.decode(request, result)
-    end
-
-    #todo - test
-    @spec describe(any, Keyword.t) :: any
-    def describe(query, opts) do
-      query
-    end
-
-    # todo - test
-    @spec encode(any, any, Keyword.t) :: any
-    def encode(%Orientex.Query{request: request, session_id: session_id, query: query} = q, params, opts) do
-      Request.encode(request, session_id, query, params, opts)
-    end
-
-    # todo - test
-    @spec parse(any, Keyword.t) :: any
-    def parse(query, opts) do
-      query
-    end
+  # todo - test
+  @spec parse(query :: any, opts :: Keyword.t) :: any
+  def parse(%Query{name: name} = query, _opts) do
+    %Query{query | name: IO.iodata_to_binary(name)}
   end
+
+  #todo - test
+  @spec describe(query :: any, opts :: Keyword.t) :: any
+  def describe(query, _opts) do
+    query
+  end
+
+  # todo - test
+  @spec encode(query :: any, params :: any, opts :: Keyword.t) :: any
+  def encode(%Query{} = query, params, opts) do
+    Request.encode(query.request, query.session_id, query.statement, params, opts)
+  end
+
+  # todo - test
+  @spec decode(query :: any, result :: any, Keyword.t) :: any
+  def decode(%Orientex.Query{request: request}, result, opts) do
+    # mapper = opts[:decode_mapper] || fn x -> x end
+    # response = Response.decode(request, result)
+    # rows = do_decode(response, mapper)
+    # %Response{response | rows: rows}
+    Response.decode(request, result)
+  end
+
+  # defp do_decode(result, mapper) do
+  #   IO.puts "Orientex.Query.do_decode()"
+  #   IO.inspect result
+  #   IO.inspect mapper
+  # end
 end
 
 defimpl String.Chars, for: Orientex.Query do
-  def to_string(%Orientex.Query{query: query}) do
-    IO.iodata_to_binary(query)
+  def to_string(%Orientex.Query{statement: statement}) do
+    IO.iodata_to_binary(statement)
   end
 end
