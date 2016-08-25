@@ -4,7 +4,7 @@ defmodule Orientex.Request.Command do
   alias Orientex.Types
 
   # todo - docs, specs, test
-  def encode(query, params, opts) do
+  def encode(query, _params, _opts) do
     class_name = query |> get_class_name_encoding_for_query() |> Types.encode()
 
     # todo - allow passing in the limit

@@ -13,7 +13,7 @@ defmodule Orientex.Response.Command do
     %Result{content: parse_result(<<result_type>>, tail), num_rows: count, session_id: session_id, success: success}
   end
 
-  defp parse_result("l", [{count, records}, 0]) do
+  defp parse_result("l", [{_count, records}, 0]) do
     Enum.map(records, &parse_record/1)
   end
 
@@ -38,7 +38,7 @@ defmodule Orientex.Response.Command do
     }
   end
 
-  defp parse_properties(<<0, _ :: binary>> = foo, data, acc), do: acc # the end of the header
+  defp parse_properties(<<0, _ :: binary>> = _content, _data, acc), do: acc # the end of the header
   defp parse_properties(content, data, acc) do
     {key, value, tail} = content |> parse_header_property_type() |> parse_header_property() |> parse_property(data)
     parse_properties(tail, data, Map.put(acc, key, value))

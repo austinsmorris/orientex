@@ -55,13 +55,13 @@ defmodule Orientex.Protocol do
 
   @spec handle_prepare(DBConnection.query, opts :: Keyword.t, state :: any) ::
     {:ok, DBConnection.query, new_state :: any} | {:error | :disconnect, Exception.t, new_state :: any}
-  def handle_prepare(%Query{} = query, opts, state) do
+  def handle_prepare(%Query{} = query, _opts, state) do
     {:ok, %Query{query | session_id: state.session_id}, state}
   end
 
   @spec handle_execute(DBConnection.query, DBConnection.params, opts :: Keyword.t, state :: any) ::
     {:ok, DBConnection.result, new_state :: any} | {:error | :disconnect, Exception.t, new_state :: any}
-  def handle_execute(%Query{request: request}, params, opts, %__MODULE__{socket: {socket_module, socket}} = state) do
+  def handle_execute(%Query{request: request}, params, _opts, %__MODULE__{socket: {socket_module, socket}} = state) do
     # todo - encapsulate common code for sending request
     # todo = error check send
     # with db_connection, the encoded query is in the params.
