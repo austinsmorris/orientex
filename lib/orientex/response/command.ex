@@ -8,40 +8,46 @@ defmodule Orientex.Response.Command do
   alias Orientex.Types.Record
 
   # todo - docs, specs, test
-  # todo - we can't always get the count here.  Need to derive it from parse_result
-  def parse([success, session_id, result_type | [{count, _}, 0] = tail]) do
-    %Result{content: parse_result(<<result_type>>, tail), num_rows: count, session_id: session_id, success: success}
+  def parse([success, session_id, result_type | tail]) do
+    {num_rows, rows, content} = parse_result(<<result_type>>, tail)
+    %Result{content: content, num_rows: num_rows, rows: rows, session_id: session_id, success: success}
   end
 
-  defp parse_result("l", [{_count, records}, 0]) do
-    Enum.map(records, &parse_record/1)
+  defp parse_result("l", [{count, records}, 0]) do
+    {rows, content} = Enum.reduce(records, {[], []}, fn(record, {acc_rows, acc_content}) ->
+      {row, parsed_record} = parse_record(record)
+      {[row | acc_rows], [parsed_record, acc_content]}
+    end)
+
+    {count, rows, Enum.reverse(content)}
   end
 
   defp parse_result("n", [0]) do
-    nil
+    {0, [], nil}
   end
 
   defp parse_result("w", [record, 0]) do
+    # fixme - pretty sure this is broken now.  It needs to return {num_rows, rows, content}.
     parse_record(record)
   end
 
   defp parse_record([0, 100 | record]) do # full record, document (100 == "d")
     [cluster_id, cluster_position, record_version, content] = record
     {_serialization_version, class_name, data} = Record.decode(content)
-    properties = parse_properties(data, content, %{})
+    {row, properties} = parse_properties(data, content, {[], %{}})
 
-    %Document{
+    {row, %Document{
       class: class_name,
       properties: properties,
       rid: %RID{cluster_id: cluster_id, cluster_position: cluster_position},
       version: record_version,
-    }
+    }}
   end
 
   defp parse_properties(<<0, _ :: binary>> = _content, _data, acc), do: acc # the end of the header
-  defp parse_properties(content, data, acc) do
+  defp parse_properties(content, data, {acc_row, acc_properties}) do
     {key, value, tail} = content |> parse_header_property_type() |> parse_header_property() |> parse_property(data)
-    parse_properties(tail, data, Map.put(acc, key, value))
+    parse_properties(tail, data, {acc_row ++ [value], Map.put(acc_properties, key, value)})
   end
 
   defp parse_header_property_type(header) do

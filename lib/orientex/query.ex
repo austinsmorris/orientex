@@ -8,6 +8,7 @@ defimpl DBConnection.Query, for: Orientex.Query do
   alias Orientex.Query
   alias Orientex.Request
   alias Orientex.Response
+  alias Orientex.Result
 
   # todo - test
   @spec parse(query :: any, opts :: Keyword.t) :: any
@@ -28,20 +29,17 @@ defimpl DBConnection.Query, for: Orientex.Query do
   end
 
   # todo - test
-  @spec decode(query :: any, result :: any, Keyword.t) :: any
-  def decode(%Orientex.Query{request: request}, result, opts) do
-    # mapper = opts[:decode_mapper] || fn x -> x end
-    # response = Response.decode(request, result)
-    # rows = do_decode(response, mapper)
-    # %Response{response | rows: rows}
-    Response.decode(request, result)
+  @spec decode(query :: any, response :: any, Keyword.t) :: any
+  def decode(%Orientex.Query{request: request}, response, opts) do
+    mapper = opts[:decode_mapper] || fn x -> x end
+    result = Response.decode(request, response)
+    rows = do_decode(result, mapper)
+    %Result{result | rows: rows}
   end
 
-  # defp do_decode(result, mapper) do
-  #   IO.puts "Orientex.Query.do_decode()"
-  #   IO.inspect result
-  #   IO.inspect mapper
-  # end
+  defp do_decode(result, mapper) do
+    Enum.reduce(result.rows, [], fn(row, acc) -> [mapper.(row) | acc] end)
+  end
 end
 
 defimpl String.Chars, for: Orientex.Query do

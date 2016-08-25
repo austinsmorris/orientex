@@ -4,7 +4,7 @@ defmodule Orientex.Mixfile do
   def project do
     [
       app: :orientex,
-      version: "0.0.12",
+      version: "0.0.13",
       elixir: "~> 1.3",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
