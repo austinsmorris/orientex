@@ -13,6 +13,7 @@ defimpl DBConnection.Query, for: Orientex.Query do
   # todo - test
   @spec parse(query :: any, opts :: Keyword.t) :: any
   def parse(%Query{name: name} = query, _opts) do
+    # todo - I don't know what this is for... (see postrex or mariaex)
     %Query{query | name: IO.iodata_to_binary(name)}
   end
 
