@@ -3,7 +3,7 @@ defmodule Orientex.Request.Command do
 
   alias Orientex.Types
 
-  # todo - docs, specs, test
+  # todo - docs, specs
   def encode(query, _params, _opts) do
     class_name = query |> get_class_name_encoding_for_query() |> Types.encode()
 
