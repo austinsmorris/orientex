@@ -1,4 +1,4 @@
-defmodule Orientex.TypeTest do
+defmodule Orientex.TypesTest do
   use ExUnit.Case
 
   alias Orientex.Types
@@ -125,6 +125,11 @@ defmodule Orientex.TypeTest do
   #
   # end
 
+  test "encode list encodes items in list" do
+    encoded = Types.encode([nil, true, {:short, 165}, {:string, "aa"}])
+    assert encoded == <<-1 :: signed-size(32), 1, 165 :: signed-size(16), 0, 0, 0, 2, 97, 97>>
+  end
+
   test "encode nil" do
     encoded = Types.encode(nil)
     assert encoded == <<-1 ::signed-size(32)>>
@@ -170,6 +175,11 @@ defmodule Orientex.TypeTest do
     assert encoded == <<0, 0, 0, 2, 97, 97>>
   end
 
+  test "encode string nil encodes like empty string" do
+    encoded = Types.encode({:string, nil})
+    assert encoded == <<0, 0, 0, 0>>
+  end
+
   test "encode string encodes like binary" do
     encoded = Types.encode({:string, "aa"})
     assert encoded == <<0, 0, 0, 2, 97, 97>>
@@ -185,8 +195,127 @@ defmodule Orientex.TypeTest do
     assert encoded == <<0, 0, 0, 3, 0, 0, 0, 2, 97, 97, 0, 0, 0, 2, 98, 98, 0, 0, 0, 1, 99>>
   end
 
-  test "encode list encodes items in list" do
-    encoded = Types.encode([nil, true, {:short, 165}, {:string, "aa"}])
-    assert encoded == <<-1 :: signed-size(32), 1, 165 :: signed-size(16), 0, 0, 0, 2, 97, 97>>
+  test "encode record" do
+    assert false
+  end
+
+  test "get data type for boolean" do
+    data_type = Types.get_data_type(:boolean)
+    assert data_type == 0
+  end
+
+  test "get data type for int" do
+    data_type = Types.get_data_type(:int)
+    assert data_type == 1
+  end
+
+  test "get data type for short" do
+    data_type = Types.get_data_type(:short)
+    assert data_type == 2
+  end
+
+  test "get data type for long" do
+    data_type = Types.get_data_type(:long)
+    assert data_type == 3
+  end
+
+  test "get data type for float" do
+    data_type = Types.get_data_type(:float)
+    assert data_type == 4
+  end
+
+  test "get data type for double" do
+    data_type = Types.get_data_type(:double)
+    assert data_type == 5
+  end
+
+  test "get data type for datetime" do
+    data_type = Types.get_data_type(:datetime)
+    assert data_type == 6
+  end
+
+  test "get data type for string" do
+    data_type = Types.get_data_type(:string)
+    assert data_type == 7
+  end
+
+  test "get data type for binary" do
+    data_type = Types.get_data_type(:binary)
+    assert data_type == 8
+  end
+
+  test "get data type for embedded" do
+    data_type = Types.get_data_type(:embedded)
+    assert data_type == 9
+  end
+
+  test "get data type for embedded_list" do
+    data_type = Types.get_data_type(:embedded_list)
+    assert data_type == 10
+  end
+
+  test "get data type for embedded_set" do
+    data_type = Types.get_data_type(:embedded_set)
+    assert data_type == 11
+  end
+
+  test "get data type for embedded_map" do
+    data_type = Types.get_data_type(:embedded_map)
+    assert data_type == 12
+  end
+
+  test "get data type for link" do
+    data_type = Types.get_data_type(:link)
+    assert data_type == 13
+  end
+
+  test "get data type for link_list" do
+    data_type = Types.get_data_type(:link_list)
+    assert data_type == 14
+  end
+
+  test "get data type for link_set" do
+    data_type = Types.get_data_type(:link_set)
+    assert data_type == 15
+  end
+
+  test "get data type for link_map" do
+    data_type = Types.get_data_type(:link_map)
+    assert data_type == 16
+  end
+
+  test "get data type for byte" do
+    data_type = Types.get_data_type(:byte)
+    assert data_type == 17
+  end
+
+  test "get data type for transient" do
+    data_type = Types.get_data_type(:transient)
+    assert data_type == 18
+  end
+
+  test "get data type for date" do
+    data_type = Types.get_data_type(:date)
+    assert data_type == 19
+  end
+
+  test "get data type for custom" do
+    data_type = Types.get_data_type(:custom)
+    assert data_type == 20
+  end
+
+  test "get data type for decimal" do
+    data_type = Types.get_data_type(:decimal)
+    assert data_type == 21
+  end
+
+  test "get data type for link_bag" do
+    data_type = Types.get_data_type(:link_bag)
+    assert data_type == 22
+  end
+
+  test "get data type for any" do
+    data_type = Types.get_data_type(:any)
+    assert data_type == 23
   end
 end
