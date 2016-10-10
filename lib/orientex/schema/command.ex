@@ -7,15 +7,13 @@ defmodule Orientex.Schema.Command do
     [:byte, :int, :byte, &get_schema_for_result_type/1]
   end
 
-  def get_schema_for_result_type(108) do # 108 is the byte for "l"
+  defp get_schema_for_result_type(108) do # 108 is the byte for "l" (list of records)
     [{:int, [:short, :byte, :short, :long, :int, :record]}, :byte]
   end
-
-  def get_schema_for_result_type(110) do # 110 is the byte for "n"
+  defp get_schema_for_result_type(110) do # 110 is the byte for "n" (null result)
     [:byte]
   end
-
-  def get_schema_for_result_type(119) do # 119 is the byte for "w"
+  defp get_schema_for_result_type(119) do # 119 is the byte for "w" (wrapped single record)
     [[:short, :byte, :short, :long, :int, :record], :byte]
   end
 end
