@@ -5,6 +5,8 @@ defmodule Orientex.Types.Record do
   alias Orientex.Types
   use Bitwise, skip_operators: true
 
+  # Decode!
+
   # todo - docs, specs, test
   def decode(data) do
     {:ok, serialization_version, tail} = Types.decode(:byte, data)
@@ -39,14 +41,59 @@ defmodule Orientex.Types.Record do
   defp do_decode_zigzag(zigzag, tail) when rem(zigzag, 2) == 0, do: {div(zigzag, 2), tail}
   defp do_decode_zigzag(zigzag, tail) when rem(zigzag, 2) == 1, do: {-div(zigzag, 2) - 1, tail}
 
+  # Encode!
 
+  def encode(%Document{} = record) do
+    serialization_version = Types.encode({:byte, 0})
+    class_name = encode({:varint_string, record.class})
+    header_and_data = do_encode_record_properties(record.properties, byte_size(serialization_version <> class_name))
+    serialization_version <> class_name <> header_and_data
+  end
 
   def encode({:varint, value}) do
     value |> do_encode_zigzag() |> do_encode_varint
   end
 
-  def encode({:varint_string, value}) do
+  def encode({:varint_string, nil}), do: encode({:varint_string, ""})
+  def encode({:varint_string, value}) when is_binary(value) do
     encode({:varint, byte_size(value)}) <> value
+  end
+
+  def encode({:embedded_map, %{} = map}, pointer) do
+    encoded_size = encode({:varint, map_size(map)})
+    pointer = pointer + get_embedded_map_header_size(map) + byte_size(encoded_size)
+
+    {header, data, _} = Enum.reduce(map, {<<>>, <<>>, pointer}, fn({key, value}, {header_acc, data_acc, pointer}) ->
+      key_data_type = get_property_data_type(key)
+      value_data_type = get_property_data_type(value)
+
+      encoded_header = Types.encode({:byte, Types.get_data_type(key_data_type)}) <> encode({:varint_string, key}) <>
+        <<pointer :: signed-size(32)>> <> Types.encode({:byte, Types.get_data_type(value_data_type)})
+
+      encoded_data = do_encode_record_data(value_data_type, value, pointer)
+
+      {header_acc <> encoded_header, data_acc <> encoded_data, pointer + byte_size(encoded_data)}
+    end)
+
+    encoded_size <> header <> data
+  end
+
+  defp do_encode_record_properties(nil, pointer), do: do_encode_record_properties(%{}, pointer)
+  defp do_encode_record_properties(%{} = properties, pointer) do
+    pointer = pointer + get_record_header_size(properties)
+
+    acc = {<<>>, <<>>, pointer}
+    {header, data, _} = Enum.reduce(properties, acc, fn({key, value}, {header_acc, data_acc, pointer}) ->
+      data_type = get_property_data_type(value)
+      encoded_header = encode({:varint_string, key}) <> <<pointer :: signed-size(32)>> <>
+        Types.encode({:byte, Types.get_data_type(data_type)})
+
+      encoded_data = do_encode_record_data(data_type, value, pointer)
+
+      {header_acc <> encoded_header, data_acc <> encoded_data, pointer + byte_size(encoded_data)}
+    end)
+
+    header <> encode({:varint, 0}) <> data
   end
 
   defp do_encode_varint(value) when value >= 0 and value <= 127, do: <<value>>
@@ -57,51 +104,23 @@ defmodule Orientex.Types.Record do
   defp do_encode_zigzag(value) when value >= 0, do: value * 2
   defp do_encode_zigzag(value) when value < 0, do: -(value * 2) - 1
 
+  defp do_encode_record_data(:string, value, _pointer), do: encode({:varint_string, value})
+  defp do_encode_record_data(:embedded_map, value, pointer), do: encode({:embedded_map, value}, pointer)
 
-
-  def encode(%Document{} = record) do
-    # todo - (serialization-version:byte)(class-name:string)(header:byte[])(data:byte[])
-    serialization_version = Types.encode({:byte, 0})
-    class_name = Types.encode({:string, record.class})
-    header_and_data = do_encode_properties(record.properties, byte_size(serialization_version <> class_name))
-    serialization_version <> class_name <> header_and_data
-  end
-
-  defp do_encode_properties(%{} = properties, pointer) do
-    {properties_list, new_pointer} = Enum.reduce(properties, {[], pointer}, fn({property, value}, {list, pointer}) ->
-      # propery is a string value
-      encoded_field_name = encode({:varint_string, property})
-
-      data_type = get_property_data_type(value)
-      encoded_data_type = Types.encode({:byte, Types.get_data_type(data_type)})
-
-      pointer = pointer + byte_size(encoded_field_name <> <<0 :: signed-size(32)>> <> encoded_data_type)
-
-      encoded_data = do_encode_record_data(data_type, value)
-
-      {[{encoded_field_name, encoded_data_type, encoded_data} | list], pointer}
+  defp get_embedded_map_header_size(%{} = map) do
+    Enum.reduce(map, 0, fn({key, _value}, acc) ->
+      acc + byte_size(encode({:varint_string, key})) + 6 # 6 = key-type + pointer-to-data + value-type
     end)
-
-    foo = Enum.reverse(properties_list)
-
-    header_end = encode({:varint, 0})
-    {encoded_header, encoded_data, _} = Enum.reduce(
-      foo,
-      {<<>>, <<>>, new_pointer + byte_size(header_end)},
-      fn({encoded_field_name, encoded_data_type, encoded_data}, {header, data, offset}) ->
-        new_header = header <> encoded_field_name <> <<offset :: signed-size(32)>> <> encoded_data_type
-        {new_header, data <> encoded_data, offset + byte_size(encoded_data)}
-      end
-    )
-
-    encoded_header <> header_end <> encoded_data
   end
 
-
-
-  defp do_encode_record_data(:string, value), do: encode({:varint_string, value})
-  defp do_encode_record_data(:embedded_map, value), do: encode({:varint_string, value})
+  defp get_record_header_size(%{} = properties) do
+    # initial accumulator of 1 accounts for the header ending <<0>>
+    Enum.reduce(properties, 1, fn({key, value}, acc) ->
+      encoded_data_type = Types.encode({:byte, Types.get_data_type(get_property_data_type(value))})
+      acc + byte_size(encode({:varint_string, key}) <> <<0 :: signed-size(32)>> <> encoded_data_type)
+    end)
+  end
 
   defp get_property_data_type(value) when is_binary(value), do: :string
-  defp get_property_data_type(%{} = value), do: :embedded_map
+  defp get_property_data_type(%{} = _value), do: :embedded_map
 end

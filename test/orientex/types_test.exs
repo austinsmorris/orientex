@@ -1,7 +1,9 @@
 defmodule Orientex.TypesTest do
   use ExUnit.Case
 
+  alias Orientex.Document
   alias Orientex.Types
+  alias Orientex.Types.Record
 
   test "decode boolean false with trailing data" do
     {:ok, value, tail} = Types.decode(:boolean, <<0, 4>>)
@@ -136,7 +138,7 @@ defmodule Orientex.TypesTest do
   end
 
   test "encode false" do
-    encoded = Types.encode(false)
+    encoded = Types.encode(:false)
     assert encoded == <<0>>
   end
 
@@ -170,6 +172,11 @@ defmodule Orientex.TypesTest do
     assert encoded == <<45_234_234 :: signed-size(64)>>
   end
 
+  test "encode bytes nil encodes like empty string" do
+    encoded = Types.encode({:bytes, nil})
+    assert encoded == <<0, 0, 0, 0>>
+  end
+
   test "encode bytes encodes like binary" do
     encoded = Types.encode({:bytes, <<97, 97>>})
     assert encoded == <<0, 0, 0, 2, 97, 97>>
@@ -195,8 +202,16 @@ defmodule Orientex.TypesTest do
     assert encoded == <<0, 0, 0, 3, 0, 0, 0, 2, 97, 97, 0, 0, 0, 2, 98, 98, 0, 0, 0, 1, 99>>
   end
 
-  test "encode record" do
-    assert false
+  test "encode record with only properties" do
+    record = %Document{properties: %{"foo" => "bar"}}
+    encoded = Types.encode(record)
+    assert encoded == Record.encode(record)
+  end
+
+  test "encode record with class name and properties" do
+    record = %Document{class: "Test", properties: %{"foo" => "bar"}}
+    encoded = Types.encode(record)
+    assert encoded == Record.encode(record)
   end
 
   test "get data type for boolean" do
