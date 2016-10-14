@@ -27,7 +27,6 @@ defmodule Orientex.Types do
   def decode(:bytes, data) when is_binary(data), do: decode(:binary, data)
   def decode(:record, data) when is_binary(data), do: decode(:binary, data)
   def decode(:string, data) when is_binary(data), do: decode(:binary, data)
-
   def decode(:binary, <<length :: signed-size(32), value :: binary>> = data) when is_binary(data) do
     decode_binary(length, value)
   end
@@ -102,8 +101,8 @@ defmodule Orientex.Types do
   def encode(nil), do: encode({:int, -1})
 
   # boolean
-  def encode(:false), do: <<0>>
-  def encode(:true), do: <<1>>
+  def encode(false), do: <<0>>
+  def encode(true), do: <<1>>
 
   # byte
   def encode({:byte, value}) when is_binary(value) and byte_size(value) == 1, do: value
@@ -122,6 +121,7 @@ defmodule Orientex.Types do
   end
 
   # bytes and strings
+  def encode({:bytes, nil}), do: encode({:bytes, ""})
   def encode({:bytes, value}) when is_binary(value), do: encode({:binary, value})
   def encode({:string, nil}), do: encode({:string, ""})
   def encode({:string, value}) when is_binary(value), do: encode({:binary, value})
@@ -132,7 +132,6 @@ defmodule Orientex.Types do
     encode({:int, length(value)}) <> Enum.reduce(value, <<>>, fn(string, acc) -> acc <> encode({:string, string}) end)
   end
 
-  # todo - record
   def encode(%Document{} = record), do: Record.encode(record)
 
   def get_data_type(:boolean), do: 0

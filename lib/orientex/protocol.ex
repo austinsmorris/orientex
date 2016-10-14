@@ -39,7 +39,7 @@ defmodule Orientex.Protocol do
         # todo - error check response data
         # todo - validate request session id is nil
         # todo - do something with db cluster data, cluster config, orientdb-release
-        [success, request_session_id, session_id | _] = result
+        [_success, _request_session_id, session_id | _] = result
 
         {:ok, %__MODULE__{protocol_version: protocol_version, session_id: session_id, socket: {:gen_tcp, socket}}}
     end
